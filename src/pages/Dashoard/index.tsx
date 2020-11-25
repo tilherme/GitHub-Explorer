@@ -4,9 +4,10 @@ import api from '../../services/api'
 
 import logoImg from '../../assets/Logo.svg';
 
-import {Title, Form, Repositories} from './styles'
+import {Title, Form, Repositories, Error} from './styles'
 import Repository from '../Repository';
 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 interface Repository {
   full_name: string;
   description: string;
@@ -18,28 +19,41 @@ interface Repository {
 
 const Dashoard: React.FC = () => {
   const [newRepo, setNewRepo] = useState('');
+  const [inputError, setInputError] = useState('');
   const [repositories, setRepositories] = useState<Repository[]>([]);
 
  async function handleAddRepository(event: FormEvent<HTMLFormElement>):Promise<void> {
-    event.preventDefault();
+  event.preventDefault();
+  if(!newRepo ){
+    setInputError('Digite o autor/nome do repositório');
+    return;
+  }
+   try{
+    
     const response = await api.get<Repository>(`repos/${newRepo}`)
     const repository = response.data;
     setRepositories([...repositories, repository]);
     setNewRepo('');
+    setInputError('')
+   } catch (err) {
+     setInputError('Erro na busca por esse repositório ')
+   }
  }
   
     return (
         <>
         <img src={logoImg} alt="Img" />
         <Title>Explore repositórios no github</Title>
-        <Form onSubmit={handleAddRepository}>
+        <Form hasError={!!inputError} onSubmit={handleAddRepository}>
           <input 
           value ={newRepo}
           onChange={(e): void => setNewRepo(e.target.value)}
           placeholder="Digite o nome do repositório"/>  
           <button type="submit">Pesquisar</button>
         </Form>
-
+      
+          {inputError && <Error> {inputError} </Error>}
+        
         <Repositories>
          {repositories.map(repository =>( 
             <a key={repository.full_name} href="teste">
