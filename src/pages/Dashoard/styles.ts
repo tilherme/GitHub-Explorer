@@ -11,7 +11,10 @@ export const Title = styled.h1`
     max-width: 450px;
     line-height: 56px;
     margin-top: 80px;
-`;
+   
+    `;
+
+
 export const Form = styled.form<FormProps>`
     margin-top: 40px;
     max-width: 700px;
